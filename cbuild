@@ -1,0 +1,5 @@
+AddExe dpc
+Source src/dpc.cc
+Link stdc++
+Link c
+Link m
