@@ -11,7 +11,7 @@ struct Shortenizer{
 
         for(Scope scope : scopes) {
             if(scope.tokens[1].kind == Token_Kind::CLOSED_BRACE) {
-                scope.tokens[1].value == "";
+                scope.tokens[1].value = "";
             }
             result.push_back(scope);
         }
