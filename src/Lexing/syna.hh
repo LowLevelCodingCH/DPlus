@@ -8,7 +8,7 @@
  * exit MUST return an integer                                                                      //NOTE: Finished
  * Structure of vars must be TYPE NAME = VALUE;                                                     //NOTE: Finished
  * CALL must have 1 arg                                                                             //NOTE: Finished
- * Inside of "alloc();" there must be an integer and also in PUSH();                                //NOTE: Finished
+ * Inside of "alloc();" there must be an integer and also in PUSH() and pushptr;                    //NOTE: Finished
  * POP doesnt take any args                                                                         //NOTE: Finished
  * parenthesis "[]{}()" should have a closing partner that should be calculated
 */
@@ -88,7 +88,7 @@ struct Syna{
           }
         }
 
-        // Rule 6: * Inside of "alloc();" there must be an integer and also in PUSH();
+        // Rule 6: * Inside of "alloc();" there must be an integer and also in PUSH(); and pushptr
 
         if(tokens[i].value == "alloc") {
           if(tokens[i+2].kind != Token_Kind::INTEGER_LITERAL){
@@ -98,8 +98,15 @@ struct Syna{
         }
 
         if(tokens[i].value == "push") {
-          if(tokens[i+2].kind != Token_Kind::INTEGER_LITERAL){
-            std::cerr << "[SYNA-ERROR]: {At: " << i << "} Pushing does not have integer argument" << std::endl;
+          if(tokens[i+2].kind != Token_Kind::INTEGER_LITERAL && tokens[i+2].kind != Token_Kind::WORD){
+            std::cerr << "[SYNA-ERROR]: {At: " << i << "} Pushing does not have integer or var argument" << std::endl;
+            exit(1);
+          }
+        }
+
+        if(tokens[i].value == "pushptr") {
+          if(tokens[i+2].kind != Token_Kind::WORD){
+            std::cerr << "[SYNA-ERROR]: {At: " << i << "} Pushing a pointer does not have var argument" << std::endl;
             exit(1);
           }
         }

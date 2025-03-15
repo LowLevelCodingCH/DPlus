@@ -2,28 +2,28 @@
 #define AGEN_H_
 
 struct Agen {
-    std::string Generate(std::vector<Scope> scopes) {
-    std::cout << "[INFO]: Generating" << std::endl;
+  std::string Generate(std::vector<Scope> scopes) {
+  std::cout << "[INFO]: Generating" << std::endl;
 
 	std::stringstream output;
 
 	output << "section .text\n";
-    output << "  global _start\n";
+  output << "  global _start\n";
 
 	std::stringstream secdata;
 
 	secdata << "section .data\n";
 
 	int label_num = 0;
-    int tnum = 0;
+  int tnum = 0;
  
  	std::string label = "SV" + std::to_string(label_num);
-    std::string labellen = "SL" + std::to_string(label_num);
+  std::string labellen = "SL" + std::to_string(label_num);
  
  	label = "SV" + std::to_string(label_num);
 
 	std::string ctl;
-    std::string times = "0";
+  std::string times = "0";
 
 	secdata << "ten equ 10\n";
     secdata << "hundred equ 100\n";
@@ -136,6 +136,10 @@ struct Agen {
                     current << "\n  ; PUSH\n";
                     current << "  mov rax, " << tokens[i+2].value << "\n";
                     current << "  push QWORD rax" << "\n";
+                }
+                if(tokens[i].value == "pushptr") {
+                    current << "\n  ; PUSHPTR\n";
+                    current << "  push " << tokens[i+2].value << "\n";
                 }
                 if(tokens[i].value == "exit") {
                     current << "\n  ; EXIT\n";

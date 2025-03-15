@@ -12,15 +12,14 @@
 #include <string>
 #include <random>
 
-/**
- * *
+/*
  * KEYWORDS:
  *
  * "proc" "return" "exit" "write" "call" "alloc" "push" "pop"
-    "loop" "endloop" "times" "endtimes" "repeat" "do" "String"
-    "Int" "Bool" "true" "false" "read" "external" "open" "close"
-    "NString" "fwrite" "fread" "sof" "while" "endwhile" "if" "endif"
-    "scope" "mexpr"
+ * "loop" "endloop" "times" "endtimes" "repeat" "do" "String"
+ * "Int" "Bool" "true" "false" "read" "external" "open" "close"
+ * "NString" "fwrite" "fread" "sof" "while" "endwhile" "if" "endif"
+ * "scope" "mexpr" "pushptr"
  *
 */
 
@@ -88,7 +87,7 @@ int main(int argc, char** argv){
           std::cerr << "[DPC-ERROR]: Error opening file." << std::endl;
           exit(1);
       }
-      // Lex, Analyze, Optimize, Scope, Parse, Generate
+      // Lex, Analyze, Optimize, Scope, Parse, Generate, Shorten
 
 
       std::string assembly = agen->Generate(
@@ -103,7 +102,7 @@ int main(int argc, char** argv){
         )
       );
 
-	  ofile << "; D+ ASSEMBLY GENERATED\n";
+	    ofile << "; D+ ASSEMBLY GENERATED\n";
       ofile << assembly << "\n";
       ofile << dpgen << "\n";
 

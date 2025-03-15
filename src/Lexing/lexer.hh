@@ -173,6 +173,9 @@ struct Lexer {
           } else if (Buffer == "external") {
             Lexed.push_back({Token_Kind::KEYWORD, Buffer});
             Buffer = "";
+          } else if (Buffer == "pushptr") {
+            Lexed.push_back({Token_Kind::KEYWORD, Buffer});
+            Buffer = "";
           } else if (Buffer == "exit") {
             Lexed.push_back({Token_Kind::KEYWORD, Buffer});
             Buffer = "";
