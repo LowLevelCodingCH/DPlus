@@ -15,8 +15,8 @@ typedef enum {
   OPEN_PARENTHESIS,      // (
   CLOSED_PARENTHESIS,    // )
 
-  OPEN_SQUARE,           // [
-  CLOSED_SQUARE,         // ]
+  //OPEN_SQUARE,           // [
+  //CLOSED_SQUARE,         // ]
 
   SEMI_COLON,            // ;
   COMMA,                 // ,
@@ -54,8 +54,8 @@ std::string TTS(Token_Kind token){
         case Token_Kind::CLOSED_BRACE: return "[CLOSED_BRACE]"; break;
         case Token_Kind::OPEN_PARENTHESIS: return "[OPEN_PARENTHESIS]"; break;
         case Token_Kind::CLOSED_PARENTHESIS: return "[CLOSED_PARENTHESIS]"; break;
-        case Token_Kind::OPEN_SQUARE: return "[OPEN_SQUARE]"; break;
-        case Token_Kind::CLOSED_SQUARE: return "[CLOSED_SQUARE]"; break;
+        //case Token_Kind::OPEN_SQUARE: return "[OPEN_SQUARE]"; break;
+        //case Token_Kind::CLOSED_SQUARE: return "[CLOSED_SQUARE]"; break;
         case Token_Kind::SEMI_COLON: return "[SEMI_COLON]"; break;
         case Token_Kind::COMMA: return "[COMMA]"; break;
         case Token_Kind::PERIOD: return "[PERIOD]"; break;
@@ -79,8 +79,8 @@ bool IsSpecial (char C) {
     case '\n': return true; break;
     case '\t': return true; break;
     case ' ': return true; break;
-    case '[': return true; break;
-    case ']': return true; break;
+    //case '[': return true; break;
+    //case ']': return true; break;
     case '{': return true; break;
     case '}': return true; break;
     case '(': return true; break;
@@ -131,6 +131,9 @@ struct Lexer {
           } else if (Buffer == "call") {
             Lexed.push_back({Token_Kind::KEYWORD, Buffer});
             Buffer = "";
+          } else if (Buffer == "asm") {
+            Lexed.push_back({Token_Kind::KEYWORD, Buffer});
+            Buffer = "";
           } else if (Buffer == "repeat") {
             Lexed.push_back({Token_Kind::WORD, Buffer});
             Buffer = "";
@@ -141,6 +144,9 @@ struct Lexer {
             Lexed.push_back({Token_Kind::KEYWORD, Buffer});
             Buffer = "";
           } else if (Buffer == "mexpr") {
+            Lexed.push_back({Token_Kind::KEYWORD, Buffer});
+            Buffer = "";
+          } else if (Buffer == "poke") {
             Lexed.push_back({Token_Kind::KEYWORD, Buffer});
             Buffer = "";
           } else if (Buffer == "while") {
@@ -179,6 +185,8 @@ struct Lexer {
           } else if (Buffer == "exit") {
             Lexed.push_back({Token_Kind::KEYWORD, Buffer});
             Buffer = "";
+          } else if (Buffer == "Var") {
+            Lexed.push_back({Token_Kind::TYPE, Buffer});
           } else if (Buffer == "Int") {
             Lexed.push_back({Token_Kind::TYPE, Buffer});
           } else if (Buffer == "Bool") {

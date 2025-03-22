@@ -2,4 +2,4 @@ clean:
 	rm dpc
 
 build:
-	gcc -o dpc src/dpc.cc -lstdc++ -lc -lm
+	gcc -static -o dpc src/dpc.cc -lstdc++ -lc -lm

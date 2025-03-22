@@ -8,7 +8,6 @@ struct Agen {
 	std::stringstream output;
 
 	output << "section .text\n";
-  output << "  global _start\n";
 
 	std::stringstream secdata;
 
@@ -25,12 +24,6 @@ struct Agen {
 	std::string ctl;
   std::string times = "0";
 
-	secdata << "ten equ 10\n";
-    secdata << "hundred equ 100\n";
-    secdata << "thosand equ 1000\n";
-    secdata << "Hello_World db \"Hello, World!\"\n";
-    secdata << "MARK_SIGN db \"D PLUS EXECUTABLE: https://github.com/lowlevelcodingch/dplus\",0xa,0\n";
-
     for(Scope scope : scopes) {
         std::stringstream current;
         labellen = "SL" + std::to_string(label_num);
@@ -43,7 +36,20 @@ struct Agen {
             label = "SV" + std::to_string(label_num);
             labellen = "SL" + std::to_string(label_num);
             ctl = "BL" + std::to_string(tnum);
+	    if(tokens[i].kind == Token_Kind::WORD) {
+	    	if(tokens[i+1].kind == Token_Kind::EQUAL) {
+			if(tokens[i+2].kind == Token_Kind::INTEGER_LITERAL) {
+				current << "\n ; setting var\n";
+				current << "  mov [" << tokens[i].value << "], DWORD " << tokens[i+2].value << "\n";
+			}
+		}
+	    }
             if(tokens[i].kind == Token_Kind::KEYWORD) {
+		if(tokens[i].value == "asm" && tokens[i+1].kind == Token_Kind::STRING_LITERAL) {
+		    current << "\n  ; ASM\n";
+		    current << tokens[i+1].value.substr(1, tokens[i+1].value.length() - 2) << "\n";
+		}
+
                 if(tokens[i].value == "while") {
                     current << "\n   ; WHILE\n";
                     current << "jmp " << ctl << "K\n";
@@ -52,9 +58,11 @@ struct Agen {
                 if(tokens[i].value == "endwhile") {
                     current << "\n   ; ENDWHILE\n";
                     current << ctl << "K:\n";
-                    current << "  mov r8, " << tokens[i+1].value << "\n";
-                    current << "  mov r9, " << tokens[i+4].value << "\n";
-                    current << "  cmp r8, r9\n";
+                    current << "  mov [esp-4], " << tokens[i+1].value << "\n";
+		    current << "  mov eax, DWORD " << tokens[i+4].value << "\n";
+                    current << "  mov [esp-8], eax\n";
+		    current << "  mov eax, DWORD [esp-8]\n";
+                    current << "  cmp [esp-8], eax\n";
                     if(tokens[i+2].kind == Token_Kind::EQUAL &&
                     tokens[i+3].kind == Token_Kind::EQUAL)
                       current << "  je B" << ctl << "\n";
@@ -80,9 +88,12 @@ struct Agen {
                     current << "\n   ; ENDIF\n";
                     current << "  jmp E" << ctl << "\n";
                     current << ctl << "K:\n";
-                    current << "  mov r8, " << tokens[i+1].value << "\n";
-                    current << "  mov r9, " << tokens[i+4].value << "\n";
-                    current << "  cmp r8, r9\n";
+		    current << "  mov eax, DWORD " << tokens[i+1].value << "\n"; 
+                    current << "  mov [esp-4], eax\n";
+		    current << "  mov eax, DWORD " << tokens[i+4].value << "\n";
+                    current << "  mov [esp-8], eax\n";
+		    current << "  mov eax, DWORD [esp-8]\n";
+                    current << "  cmp [esp-8], eax\n";
                     if(tokens[i+2].kind == Token_Kind::EQUAL &&
                     tokens[i+3].kind == Token_Kind::EQUAL) {
                       current << "  je B" << ctl << "\n";
@@ -119,13 +130,13 @@ struct Agen {
                     times = tokens[i+1].value;
                     current << "\n  ; TIMES\n";
                     current << ctl << ":\n";
-                    current << "  add r8, 1\n";
+                    current << "  add [esp-4], DWORD 1\n";
                 }
                 if(tokens[i].value == "endtimes") {
                     current << "\n  ; ENDTIMES\n";
-                    current << "cmp r8, " << times << "\n";
+                    current << "cmp [esp-4], " << times << "\n";
                     current << "jne " << ctl << "\n";
-                    current << "mov r8, 0\n";
+                    current << "mov [esp-4], DWORD 0\n";
                     tnum++;
                 }
                 if(tokens[i].value == "pop") {
@@ -134,28 +145,36 @@ struct Agen {
                 }
                 if(tokens[i].value == "push") {
                     current << "\n  ; PUSH\n";
-                    current << "  mov rax, " << tokens[i+2].value << "\n";
+                    current << "  mov rax, " << tokens[i+1].value << "\n";
                     current << "  push QWORD rax" << "\n";
                 }
                 if(tokens[i].value == "pushptr") {
                     current << "\n  ; PUSHPTR\n";
-                    current << "  push " << tokens[i+2].value << "\n";
+                    current << "  push " << tokens[i+1].value << "\n";
+                }
+                if(tokens[i].value == "poke") {
+                    current << "\n  ; POKE\n";
+                    current << "  mov [" << tokens[i+1].value << "], BYTE " << tokens[i+2].value << "\n";
                 }
                 if(tokens[i].value == "exit") {
                     current << "\n  ; EXIT\n";
                     current << "  mov rax, 60\n";
-                    current << "  mov rdi, " << tokens[i+2].value << "\n";
+                    current << "  mov rdi, " << tokens[i+1].value << "\n";
                     current << "  syscall\n";
                     current << "  ret\n";
                 }
                 if(tokens[i].value == "sof") {
                     current << "\n  ; SOF\n";
-                    secdata << tokens[i+2].value << " equ $ - " << tokens[i+4].value << "\n";
+                    secdata << tokens[i+1].value << " equ $ - " << tokens[i+2].value << "\n";
                 }
                 if(tokens[i].value == "call") {
                     current << "\n  ; CALL\n";
-                    current << "  call " << tokens[i+2].value << "\n";
+                    current << "  call " << tokens[i+1].value << "\n";
                 }
+		if(tokens[i].value == "setvar") {
+		    current << "\n  ; SETVAR\n";
+		    current << "  mov [" << tokens[i+1].value << "], DWORD " << tokens[i+2].value << "\n";
+		}
                 if(tokens[i].value == "return") {
                     current << "\n  ; RETURN\n";
                     current << "  ret\n";
@@ -278,6 +297,9 @@ struct Agen {
                 }
                 if(tokens[i].value == "Int") {
                     secdata << tokens[i+1].value << " equ " << tokens[i+3].value << "\n";
+                }
+                if(tokens[i].value == "Var") {
+                    secdata << tokens[i+1].value << ": dd " << tokens[i+3].value << "\n";
                 }
                 if(tokens[i].value == "Bool") {
                     if(tokens[i+3].value == "true") secdata << tokens[i+1].value << " equ 1\n";
